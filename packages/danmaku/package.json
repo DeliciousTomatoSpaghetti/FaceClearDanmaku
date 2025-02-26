@@ -1,0 +1,10 @@
+{
+  "name": "danmaku",
+  "version": "1.0.0",
+  "description": "",
+  "module": "./dist/danmaku.esm.js", 
+  "main": "./dist/danmaku.cjs.js",
+  "types": "./dist/danmaku.d.ts",
+  "author": "",
+  "license": "ISC"
+}
