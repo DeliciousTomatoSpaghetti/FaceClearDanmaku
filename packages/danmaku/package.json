@@ -4,7 +4,7 @@
   "description": "",
   "module": "./dist/danmaku.esm.js", 
   "main": "./dist/danmaku.cjs.js",
-  "types": "./dist/danmaku.d.ts",
+  "types": "./dist/index.d.ts",
   "author": "",
   "license": "ISC"
 }
