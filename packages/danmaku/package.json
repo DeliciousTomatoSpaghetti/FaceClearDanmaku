@@ -2,9 +2,20 @@
   "name": "danmaku",
   "version": "1.0.0",
   "description": "",
-  "module": "./dist/danmaku.esm.js", 
-  "main": "./dist/danmaku.cjs.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "node": "./dist/danmaku.esm.mjs",
+        "default": "./dist/danmaku.esm.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/danmaku.cjs.js"
+      }
+    }
+  },
   "author": "",
   "license": "ISC"
 }

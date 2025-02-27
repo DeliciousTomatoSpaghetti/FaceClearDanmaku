@@ -2,6 +2,6 @@
   "version": 3,
   "sources": ["../src/index.ts"],
   "sourcesContent": ["export function hello(word: string) {\r\n  console.log('hello123')\r\n  return word\r\n}"],
-  "mappings": ";;;;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAO,WAAS,MAAM,MAAc;AAClC,YAAQ,IAAI,UAAU;AACtB,WAAO;AAAA,EACT;",
+  "mappings": ";AAAO,SAAS,MAAM,MAAc;AAClC,UAAQ,IAAI,UAAU;AACtB,SAAO;AACT;",
   "names": []
 }

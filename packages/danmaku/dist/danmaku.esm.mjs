@@ -6,4 +6,4 @@ function hello(word) {
 export {
   hello
 };
-//# sourceMappingURL=danmaku.esm.js.map
+//# sourceMappingURL=danmaku.esm.mjs.map

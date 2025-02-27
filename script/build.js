@@ -39,7 +39,7 @@ async function build() {
         __dirname,
         "../packages",
         target,
-        `dist/${target}.${format === "cjs" ? "cjs" : format === "esm" ? "esm" : "umd"}.js`
+        `dist/${target}.${format === "cjs" ? "cjs" : format === "esm" ? "esm" : "umd"}.${format === 'esm' ? 'mjs' : 'js'}`
       );
 
       // 配置 esbuild
