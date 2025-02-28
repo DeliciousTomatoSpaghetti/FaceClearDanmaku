@@ -2,6 +2,7 @@
 var Danmaku = class {
   element;
   parentTrack;
+  animationID = null;
   constructor(track, text) {
     this.parentTrack = track;
     this.element = document.createElement("div");
@@ -9,10 +10,24 @@ var Danmaku = class {
     this.element.style.left = `${this.parentTrack.width}px`;
     this.element.style.top = `${this.parentTrack.index * this.parentTrack.height}px`;
     this.element.innerText = text;
+    this.parentTrack.container.appendChild(this.element);
   }
   startMove() {
-    this.element.style.transition = `transform 5s linear`;
-    this.element.style.transform = `translateX(-${this.parentTrack.width}px)`;
+    let p = 0;
+    const run = () => {
+      this.animationID = requestAnimationFrame(() => {
+        this.element.style.transform = `translateX(${p}px)`;
+        p = p - 0.5;
+        run();
+      });
+    };
+    run();
+  }
+  stopMove() {
+    if (this.animationID) {
+      cancelAnimationFrame(this.animationID);
+      this.animationID = null;
+    }
   }
 };
 
@@ -21,11 +36,13 @@ var Track = class {
   height;
   width;
   index;
+  container;
   isLocked = false;
   constructor(trackOptions) {
     this.height = trackOptions.height;
     this.width = trackOptions.width;
     this.index = trackOptions.index;
+    this.container = trackOptions.container;
   }
   send(text) {
     this.isLocked = true;
@@ -41,11 +58,19 @@ var DanmakuEngine = class {
   cacheStack = [];
   isPlaying = false;
   interval = null;
-  constructor(container, options) {
-    this.container = container;
+  constructor(parentContainer, options) {
+    this.container = document.createElement("div");
+    this.container.style.position = "relative";
+    this.container.style.height = "100%";
+    this.container.style.width = "100%";
+    parentContainer.appendChild(this.container);
+    this.container.style.backgroundColor = "transparent";
     this.#initTracks();
   }
   startPlaying() {
+    if (this.isPlaying) {
+      return;
+    }
     this.isPlaying = true;
     this.interval = setInterval(() => {
       console.log("interval", this.cacheStack);
@@ -54,6 +79,7 @@ var DanmakuEngine = class {
         if (text) {
           const track = this.tracks.find((track2) => !track2.isLocked);
           if (track) {
+            console.log(track);
             track.send(text);
           }
         }
@@ -76,7 +102,8 @@ var DanmakuEngine = class {
       const track = new Track({
         height: 32,
         width: this.container.clientWidth,
-        index: i
+        index: i,
+        container: this.container
       });
       this.tracks.push(track);
     }

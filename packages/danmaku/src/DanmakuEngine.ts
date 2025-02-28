@@ -9,22 +9,32 @@ export class DanmakuEngine {
   public cacheStack: string[] = []
   public isPlaying: boolean = false
   public interval: number | null = null
-  constructor(container: HTMLElement, options: DanmakuEngineOptions) {
-    this.container = container
+  constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions) {
+    this.container = document.createElement('div')
+    this.container.style.position = 'relative'
+    this.container.style.height = '100%'
+    this.container.style.width = '100%'
+    parentContainer.appendChild(this.container)
+    this.container.style.backgroundColor = 'transparent'
     this.#initTracks()
 
   }
 
   startPlaying() {
+    if (this.isPlaying) {
+      return
+    }
     this.isPlaying = true
     this.interval = setInterval(() => {
-      console.log("interval",this.cacheStack);
-      
+      console.log("interval", this.cacheStack);
+
       if (this.cacheStack.length) {
         const text = this.cacheStack.shift()
         if (text) {
           const track = this.tracks.find(track => !track.isLocked)
           if (track) {
+            console.log(track);
+
             track.send(text)
           }
         }
@@ -50,7 +60,8 @@ export class DanmakuEngine {
       const track = new Track({
         height: 32,
         width: this.container.clientWidth,
-        index: i
+        index: i,
+        container: this.container
       })
       this.tracks.push(track)
     }

@@ -9,7 +9,7 @@ export declare class DanmakuEngine {
     cacheStack: string[];
     isPlaying: boolean;
     interval: number | null;
-    constructor(container: HTMLElement, options: DanmakuEngineOptions);
+    constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions);
     startPlaying(): void;
     stopPlaying(): void;
     send(text: string): void;
