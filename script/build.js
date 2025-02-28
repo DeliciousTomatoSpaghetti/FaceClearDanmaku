@@ -29,7 +29,8 @@ async function build() {
   try {
     // 生成类型声明文件
     console.log("Generating type declarations...");
-    execSync('tsc .\\packages\\danmaku\\src\\index.ts --emitDeclarationOnly --declaration --outDir .\\packages\\danmaku\\dist');
+    // execSync('tsc .\\packages\\danmaku\\src\\index.ts --emitDeclarationOnly --declaration --outDir .\\packages\\danmaku\\dist');
+    execSync('tsc --p ./packages/danmaku');
     // 遍历所有格式并打包
     for (const format of formats) {
       console.log(`Building ${target} in ${format} format...`);
@@ -43,7 +44,7 @@ async function build() {
       );
 
       // 配置 esbuild
-      await esbuild.build({
+      const ctx=await esbuild.context({
         entryPoints: [entry], // 入口文件
         outfile, // 输出文件
         bundle: true, // 打包所有依赖
@@ -54,6 +55,7 @@ async function build() {
       });
 
       console.log(`Build success: ${outfile}`);
+      ctx.watch();
     }
 
     console.log("All builds completed!");

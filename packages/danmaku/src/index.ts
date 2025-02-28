@@ -3,6 +3,6 @@ export function hello(word: string) {
   return word
 }
 
-export * from './DanmakuEngine';
+export {DanmakuEngine} from './DanmakuEngine';
 export * from './Track';
 export * from './Danmaku';

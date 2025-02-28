@@ -18,6 +18,8 @@ export class DanmakuEngine {
   startPlaying() {
     this.isPlaying = true
     this.interval = setInterval(() => {
+      console.log("interval",this.cacheStack);
+      
       if (this.cacheStack.length) {
         const text = this.cacheStack.shift()
         if (text) {
