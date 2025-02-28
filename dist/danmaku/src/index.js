@@ -1,4 +1,7 @@
-export declare function hello(word: string): string;
+export function hello(word) {
+    console.log('hello123');
+    return word;
+}
 export * from './DanmakuEngine';
 export * from './Track';
 export * from './Danmaku';
