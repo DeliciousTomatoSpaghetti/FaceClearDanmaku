@@ -29,24 +29,43 @@ var Danmaku = (() => {
 
   // packages/danmaku/src/Danmaku.ts
   var Danmaku = class {
-    element;
-    parentTrack;
+    element = null;
+    parentTrack = null;
     animationID = null;
+    position = null;
+    rect = null;
+    speedPerFrame = 0.5;
     constructor(track, text) {
+      this.#initDanmaku(track, text);
+    }
+    #initDanmaku(track, text) {
       this.parentTrack = track;
+      this.position = {
+        x: this.parentTrack.width,
+        y: this.parentTrack.index * this.parentTrack.height
+      };
       this.element = document.createElement("div");
-      this.element.style.position = "absolute";
-      this.element.style.left = `${this.parentTrack.width}px`;
-      this.element.style.top = `${this.parentTrack.index * this.parentTrack.height}px`;
       this.element.innerText = text;
       this.parentTrack.container.appendChild(this.element);
+      this.rect = {
+        width: this.element.clientWidth,
+        height: this.element.clientHeight
+      };
+      this.element.style.position = "absolute";
+      this.element.style.left = `${this.position.x}px`;
+      this.element.style.top = `${this.position.y}px`;
     }
     startMove() {
-      let p = 0;
+      let startX = 0;
       const run = () => {
         this.animationID = requestAnimationFrame(() => {
-          this.element.style.transform = `translateX(${p}px)`;
-          p = p - 0.5;
+          if (!this.element || !this.parentTrack || !this.rect) return;
+          this.element.style.transform = `translateX(${startX}px)`;
+          startX -= this.speedPerFrame;
+          if (startX < -this.parentTrack.width - this.rect.width - 50) {
+            this.destroy();
+            return;
+          }
           run();
         });
       };
@@ -57,6 +76,10 @@ var Danmaku = (() => {
         cancelAnimationFrame(this.animationID);
         this.animationID = null;
       }
+    }
+    destroy() {
+      this.stopMove();
+      this.element?.remove();
     }
   };
 
@@ -92,6 +115,7 @@ var Danmaku = (() => {
       this.container.style.position = "relative";
       this.container.style.height = "100%";
       this.container.style.width = "100%";
+      this.container.style.display = "flex";
       parentContainer.appendChild(this.container);
       this.container.style.backgroundColor = "transparent";
       this.#initTracks();
@@ -102,7 +126,7 @@ var Danmaku = (() => {
       }
       this.isPlaying = true;
       this.interval = setInterval(() => {
-        console.log("interval", this.cacheStack);
+        console.log("interval", this.cacheStack, Math.random());
         if (this.cacheStack.length) {
           const text = this.cacheStack.shift();
           if (text) {

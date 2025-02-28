@@ -14,6 +14,7 @@ export class DanmakuEngine {
     this.container.style.position = 'relative'
     this.container.style.height = '100%'
     this.container.style.width = '100%'
+    this.container.style.display = 'flex'
     parentContainer.appendChild(this.container)
     this.container.style.backgroundColor = 'transparent'
     this.#initTracks()
@@ -26,7 +27,7 @@ export class DanmakuEngine {
     }
     this.isPlaying = true
     this.interval = setInterval(() => {
-      console.log("interval", this.cacheStack);
+      console.log("interval", this.cacheStack, Math.random());
 
       if (this.cacheStack.length) {
         const text = this.cacheStack.shift()
