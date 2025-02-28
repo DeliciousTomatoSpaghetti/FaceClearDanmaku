@@ -40,7 +40,7 @@ export class DanmakuEngine {
           }
         }
       }
-    }, 500)
+    }, 300)
   }
 
   stopPlaying() {

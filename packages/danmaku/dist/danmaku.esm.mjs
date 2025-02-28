@@ -1,3 +1,38 @@
+// packages/danmaku/src/utils/EventEmitter.ts
+var EventEmitter = class {
+  // 存储事件及其对应的回调函数列表
+  events = {};
+  // 订阅事件
+  on(eventName, callback) {
+    if (!this.events[eventName]) {
+      this.events[eventName] = [];
+    }
+    this.events[eventName].push(callback);
+  }
+  // 只订阅一次事件，触发后自动取消订阅
+  once(eventName, callback) {
+    const onceCallback = (...args) => {
+      callback(...args);
+      this.off(eventName, onceCallback);
+    };
+    this.on(eventName, onceCallback);
+  }
+  // 取消订阅事件
+  off(eventName, callback) {
+    if (this.events[eventName]) {
+      this.events[eventName] = this.events[eventName].filter((cb) => cb !== callback);
+    }
+  }
+  // 发布事件
+  emit(eventName, ...args) {
+    if (this.events[eventName]) {
+      this.events[eventName].forEach((callback) => {
+        callback(...args);
+      });
+    }
+  }
+};
+
 // packages/danmaku/src/Danmaku.ts
 var Danmaku = class {
   element = null;
@@ -5,7 +40,8 @@ var Danmaku = class {
   animationID = null;
   position = null;
   rect = null;
-  speedPerFrame = 0.5;
+  speedPerFrame = getRandomWithinTenPercent(0.5);
+  emitter = new EventEmitter();
   constructor(track, text) {
     this.#initDanmaku(track, text);
   }
@@ -27,13 +63,16 @@ var Danmaku = class {
     this.element.style.top = `${this.position.y}px`;
   }
   startMove() {
-    let startX = 0;
+    let currX = 0;
     const run = () => {
       this.animationID = requestAnimationFrame(() => {
         if (!this.element || !this.parentTrack || !this.rect) return;
-        this.element.style.transform = `translateX(${startX}px)`;
-        startX -= this.speedPerFrame;
-        if (startX < -this.parentTrack.width - this.rect.width - 50) {
+        this.element.style.transform = `translateX(${currX}px)`;
+        currX -= this.speedPerFrame;
+        if (currX < -this.rect.width - 30) {
+          this.emitter.emit("completeShow");
+        }
+        if (currX < -this.parentTrack.width - this.rect.width - 50) {
           this.destroy();
           return;
         }
@@ -52,7 +91,15 @@ var Danmaku = class {
     this.stopMove();
     this.element?.remove();
   }
+  onCompleteShow(fn) {
+    this.emitter.once("completeShow", fn);
+  }
 };
+function getRandomWithinTenPercent(num) {
+  const tenPercent = num * 0.5;
+  const randomOffset = Math.random() * (2 * tenPercent) - tenPercent;
+  return num + randomOffset;
+}
 
 // packages/danmaku/src/Track.ts
 var Track = class {
@@ -71,6 +118,12 @@ var Track = class {
     this.isLocked = true;
     const danmaku = new Danmaku(this, text);
     danmaku.startMove();
+    danmaku.onCompleteShow(
+      () => {
+        this.isLocked = false;
+        console.log("\u89E3\u9501");
+      }
+    );
   }
 };
 
@@ -108,7 +161,7 @@ var DanmakuEngine = class {
           }
         }
       }
-    }, 500);
+    }, 300);
   }
   stopPlaying() {
     this.isPlaying = false;

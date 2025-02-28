@@ -26,7 +26,7 @@ onMounted(() => {
 
 function send() {
   if (engine) {
-    engine.send("wtf")
+    engine.send(generateRandomString())
   }
 }
 
@@ -42,6 +42,14 @@ function stop() {
   }
 }
 
-
+function generateRandomString(minLength: number = 5, maxLength: number = 20): string {
+  const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const length: number = Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength;
+  let result: string = '';
+  for (let i: number = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
 
 </script>

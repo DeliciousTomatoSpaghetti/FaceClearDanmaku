@@ -1,4 +1,5 @@
 import { Track } from "./Track"
+import { EventEmitter } from "./utils/EventEmitter"
 
 type DanmakuPosition = {
   x: number
@@ -15,7 +16,9 @@ export class Danmaku {
   public animationID: number | null = null
   public position: DanmakuPosition | null = null
   public rect: DanmakuRect | null = null
-  public speedPerFrame = 0.5
+  public speedPerFrame = getRandomWithinTenPercent(0.5)
+
+  private emitter = new EventEmitter()
 
   constructor(track: Track, text: string) {
     this.#initDanmaku(track, text)
@@ -40,14 +43,17 @@ export class Danmaku {
     this.element.style.top = `${this.position.y}px`
   }
   startMove() {
-    let startX = 0
+    let currX = 0
     const run = () => {
       this.animationID = requestAnimationFrame(() => {
         if (!this.element || !this.parentTrack || !this.rect) return
-        this.element.style.transform = `translateX(${startX}px)`
-        startX -= this.speedPerFrame
+        this.element.style.transform = `translateX(${currX}px)`
+        currX -= this.speedPerFrame
         // debugger
-        if (startX < -this.parentTrack.width - this.rect.width - 50) {
+        if (currX < -this.rect.width - 30) {
+          this.emitter.emit('completeShow')
+        }
+        if (currX < -this.parentTrack.width - this.rect.width - 50) {
           this.destroy()
           return
         }
@@ -68,4 +74,18 @@ export class Danmaku {
     this.stopMove()
     this.element?.remove()
   }
+
+  onCompleteShow(fn: () => any) {
+    this.emitter.once('completeShow', fn)
+  }
+}
+
+
+function getRandomWithinTenPercent(num: number) {
+  // 计算 10% 的范围
+  const tenPercent = num * 0.5;
+  // 生成一个在 -10% 到 10% 之间的随机偏移量
+  const randomOffset = Math.random() * (2 * tenPercent) - tenPercent;
+  // 计算最终的随机数
+  return num + randomOffset;
 }

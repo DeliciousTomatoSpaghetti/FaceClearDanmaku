@@ -25,5 +25,10 @@ export class Track {
     this.isLocked = true
     const danmaku = new Danmaku(this, text)
     danmaku.startMove()
+    danmaku.onCompleteShow(() => {
+      this.isLocked = false
+      console.log("解锁");
+    }
+    )
   }
 }
