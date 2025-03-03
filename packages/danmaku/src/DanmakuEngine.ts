@@ -43,14 +43,14 @@ export class DanmakuEngine {
 
     // 轮询每个未锁定的轨道，如果有弹幕则发送
     this.interval = setInterval(() => {
-      console.log("interval", this.cacheStack, Math.random());
+      // console.log("interval", this.cacheStack, Math.random());
 
       if (this.cacheStack.length) {
         const text = this.cacheStack.shift()
         if (text) {
           const track = this.tracks.find(track => !track.isLocked)
           if (track) {
-            console.log(track);
+            // console.log(track);
 
             track.send(text)
           }

@@ -92,12 +92,16 @@ var Danmaku = class {
     }
   }
   destroy() {
+    this.emitter.emit("beforeDestroy");
     this.stopMove();
     this.element?.remove();
     danmakuSet.delete(this);
   }
   onCompleteShow(fn) {
     this.emitter.once("completeShow", fn);
+  }
+  beforeDestroy(fn) {
+    this.emitter.on("beforeDestroy", fn);
   }
 };
 function getRandomWithinTenPercent(num) {
@@ -113,6 +117,8 @@ var Track = class {
   index;
   container;
   isLocked = false;
+  trackDanmakuSet = /* @__PURE__ */ new Set();
+  lastDanmaku = null;
   constructor(trackOptions) {
     this.height = trackOptions.height;
     this.width = trackOptions.width;
@@ -122,6 +128,15 @@ var Track = class {
   send(text) {
     this.isLocked = true;
     const danmaku = new Danmaku(this, text);
+    if (this.lastDanmaku) {
+      const leftTime = (this.width + this.lastDanmaku.currX + this.lastDanmaku.rect.width) / this.lastDanmaku.speedPerFrame;
+      const newLeftTime = this.width / danmaku.speedPerFrame;
+      if (leftTime > newLeftTime) {
+        danmaku.speedPerFrame = this.lastDanmaku.speedPerFrame;
+      }
+    }
+    this.lastDanmaku = danmaku;
+    this.trackDanmakuSet.add(danmaku);
     danmaku.startMove();
     danmaku.onCompleteShow(
       () => {
@@ -129,6 +144,10 @@ var Track = class {
         console.log("\u89E3\u9501");
       }
     );
+    danmaku.beforeDestroy(() => {
+      this.trackDanmakuSet.delete(danmaku);
+      console.log("\u5220\u9664");
+    });
   }
 };
 
@@ -161,13 +180,11 @@ var DanmakuEngine = class {
       danmaku.startMove();
     });
     this.interval = setInterval(() => {
-      console.log("interval", this.cacheStack, Math.random());
       if (this.cacheStack.length) {
         const text = this.cacheStack.shift();
         if (text) {
           const track = this.tracks.find((track2) => !track2.isLocked);
           if (track) {
-            console.log(track);
             track.send(text);
           }
         }

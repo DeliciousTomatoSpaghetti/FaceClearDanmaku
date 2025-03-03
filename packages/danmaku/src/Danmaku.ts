@@ -75,6 +75,7 @@ export class Danmaku {
   }
 
   destroy() {
+    this.emitter.emit('beforeDestroy')
     this.stopMove()
     this.element?.remove()
     danmakuSet.delete(this)
@@ -82,6 +83,10 @@ export class Danmaku {
 
   onCompleteShow(fn: () => any) {
     this.emitter.once('completeShow', fn)
+  }
+
+  beforeDestroy(fn: () => any) {
+    this.emitter.on('beforeDestroy', fn)
   }
 }
 
