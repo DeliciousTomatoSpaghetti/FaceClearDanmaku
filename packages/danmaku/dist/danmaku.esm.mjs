@@ -101,7 +101,7 @@ var Danmaku = class {
   }
 };
 function getRandomWithinTenPercent(num) {
-  const tenPercent = num * 0.5;
+  const tenPercent = num * 0.1;
   const randomOffset = Math.random() * (2 * tenPercent) - tenPercent;
   return num + randomOffset;
 }
@@ -151,6 +151,7 @@ var DanmakuEngine = class {
     this.#initTracks();
   }
   startPlaying() {
+    if (this.isPlaying) return;
     this.isPlaying = true;
     if (this.interval) {
       clearInterval(this.interval);

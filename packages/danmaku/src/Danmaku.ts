@@ -88,7 +88,7 @@ export class Danmaku {
 
 function getRandomWithinTenPercent(num: number) {
   // 计算 10% 的范围
-  const tenPercent = num * 0.5;
+  const tenPercent = num * 0.1;
   // 生成一个在 -10% 到 10% 之间的随机偏移量
   const randomOffset = Math.random() * (2 * tenPercent) - tenPercent;
   // 计算最终的随机数

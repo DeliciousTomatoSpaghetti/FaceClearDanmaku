@@ -27,6 +27,7 @@ export class DanmakuEngine {
   }
 
   startPlaying() {
+    if(this.isPlaying) return
     this.isPlaying = true
 
     // 清除之前的轮询
@@ -35,6 +36,7 @@ export class DanmakuEngine {
       this.interval = null
     }
 
+    // 继续之前的弹幕
     danmakuSet.forEach(danmaku => {
       danmaku.startMove()
     })
