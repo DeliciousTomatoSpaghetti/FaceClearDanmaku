@@ -71,6 +71,8 @@ var Danmaku = (() => {
     position = null;
     rect = null;
     speedPerFrame = getRandomWithinTenPercent(0.5);
+    currX = 0;
+    isPaused = false;
     emitter = new EventEmitter();
     constructor(track, text) {
       this.#initDanmaku(track, text);
@@ -94,16 +96,16 @@ var Danmaku = (() => {
       this.element.style.top = `${this.position.y}px`;
     }
     startMove() {
-      let currX = 0;
+      this.isPaused = false;
       const run = () => {
         this.animationID = requestAnimationFrame(() => {
           if (!this.element || !this.parentTrack || !this.rect) return;
-          this.element.style.transform = `translateX(${currX}px)`;
-          currX -= this.speedPerFrame;
-          if (currX < -this.rect.width - 30) {
+          this.element.style.transform = `translateX(${this.currX}px)`;
+          this.currX -= this.speedPerFrame;
+          if (this.currX < -this.rect.width - 30) {
             this.emitter.emit("completeShow");
           }
-          if (currX < -this.parentTrack.width - this.rect.width - 50) {
+          if (this.currX < -this.parentTrack.width - this.rect.width - 50) {
             this.destroy();
             return;
           }
@@ -116,6 +118,7 @@ var Danmaku = (() => {
       if (this.animationID) {
         cancelAnimationFrame(this.animationID);
         this.animationID = null;
+        this.isPaused = true;
       }
     }
     destroy() {
@@ -178,10 +181,14 @@ var Danmaku = (() => {
       this.#initTracks();
     }
     startPlaying() {
-      if (this.isPlaying) {
-        return;
-      }
       this.isPlaying = true;
+      if (this.interval) {
+        clearInterval(this.interval);
+        this.interval = null;
+      }
+      danmakuSet.forEach((danmaku) => {
+        danmaku.startMove();
+      });
       this.interval = setInterval(() => {
         console.log("interval", this.cacheStack, Math.random());
         if (this.cacheStack.length) {
@@ -202,6 +209,9 @@ var Danmaku = (() => {
         clearInterval(this.interval);
         this.interval = null;
       }
+      danmakuSet.forEach((danmaku) => {
+        danmaku.stopMove();
+      });
     }
     send(text) {
       this.cacheStack.push(text);
@@ -210,6 +220,7 @@ var Danmaku = (() => {
       danmakuSet.forEach((danmaku) => {
         danmaku.stopMove();
       });
+      this.isPlaying = false;
     }
     #initTracks() {
       const trackCount = 5;
@@ -227,7 +238,7 @@ var Danmaku = (() => {
 
   // packages/danmaku/src/index.ts
   function hello(word) {
-    console.log("hello123");
+    console.log("hello");
     return word;
   }
   return __toCommonJS(index_exports);

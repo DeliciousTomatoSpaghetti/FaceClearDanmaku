@@ -27,10 +27,19 @@ export class DanmakuEngine {
   }
 
   startPlaying() {
-    if (this.isPlaying) {
-      return
-    }
     this.isPlaying = true
+
+    // 清除之前的轮询
+    if (this.interval) {
+      clearInterval(this.interval)
+      this.interval = null
+    }
+
+    danmakuSet.forEach(danmaku => {
+      danmaku.startMove()
+    })
+
+    // 轮询每个未锁定的轨道，如果有弹幕则发送
     this.interval = setInterval(() => {
       console.log("interval", this.cacheStack, Math.random());
 
@@ -54,6 +63,9 @@ export class DanmakuEngine {
       clearInterval(this.interval)
       this.interval = null
     }
+    danmakuSet.forEach(danmaku => {
+      danmaku.stopMove()
+    })
   }
 
   send(text: string) {
@@ -64,6 +76,7 @@ export class DanmakuEngine {
     danmakuSet.forEach(danmaku => {
       danmaku.stopMove()
     })
+    this.isPlaying = false
   }
 
   #initTracks() {

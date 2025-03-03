@@ -18,7 +18,8 @@ export class Danmaku {
   public position: DanmakuPosition | null = null
   public rect: DanmakuRect | null = null
   public speedPerFrame = getRandomWithinTenPercent(0.5)
-
+  public currX = 0
+  public isPaused = false
   private emitter = new EventEmitter()
 
   constructor(track: Track, text: string) {
@@ -45,17 +46,17 @@ export class Danmaku {
     this.element.style.top = `${this.position.y}px`
   }
   startMove() {
-    let currX = 0
+    this.isPaused = false
     const run = () => {
       this.animationID = requestAnimationFrame(() => {
         if (!this.element || !this.parentTrack || !this.rect) return
-        this.element.style.transform = `translateX(${currX}px)`
-        currX -= this.speedPerFrame
+        this.element.style.transform = `translateX(${this.currX}px)`
+        this.currX -= this.speedPerFrame
         // debugger
-        if (currX < -this.rect.width - 30) {
+        if (this.currX < -this.rect.width - 30) {
           this.emitter.emit('completeShow')
         }
-        if (currX < -this.parentTrack.width - this.rect.width - 50) {
+        if (this.currX < -this.parentTrack.width - this.rect.width - 50) {
           this.destroy()
           return
         }
@@ -69,6 +70,7 @@ export class Danmaku {
     if (this.animationID) {
       cancelAnimationFrame(this.animationID)
       this.animationID = null
+      this.isPaused = true
     }
   }
 
