@@ -6,6 +6,7 @@
       <button @click="send">send</button>
       <button @click="start">start</button>
       <button @click="stop">stop</button>
+      <button @click="pause">pause</button>
       <!-- <button>send</button> -->
     </div>
   </div>
@@ -39,6 +40,12 @@ function start() {
 function stop() {
   if (engine) {
     engine.stopPlaying()
+  }
+}
+
+function pause() {
+  if (engine) {
+    engine.pause()
   }
 }
 

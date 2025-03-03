@@ -1,4 +1,5 @@
 import { Danmaku } from "./Danmaku"
+import { danmakuSet } from "./DanmakuEngine"
 
 export type TrackOptions = {
   height: number

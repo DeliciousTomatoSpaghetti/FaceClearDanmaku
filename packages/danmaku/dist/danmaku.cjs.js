@@ -23,6 +23,7 @@ __export(index_exports, {
   Danmaku: () => Danmaku,
   DanmakuEngine: () => DanmakuEngine,
   Track: () => Track,
+  danmakuSet: () => danmakuSet,
   hello: () => hello
 });
 module.exports = __toCommonJS(index_exports);
@@ -73,6 +74,7 @@ var Danmaku = class {
   emitter = new EventEmitter();
   constructor(track, text) {
     this.#initDanmaku(track, text);
+    danmakuSet.add(this);
   }
   #initDanmaku(track, text) {
     this.parentTrack = track;
@@ -119,6 +121,7 @@ var Danmaku = class {
   destroy() {
     this.stopMove();
     this.element?.remove();
+    danmakuSet.delete(this);
   }
   onCompleteShow(fn) {
     this.emitter.once("completeShow", fn);
@@ -157,6 +160,7 @@ var Track = class {
 };
 
 // packages/danmaku/src/DanmakuEngine.ts
+var danmakuSet = /* @__PURE__ */ new Set();
 var DanmakuEngine = class {
   container;
   tracks = [];
@@ -202,6 +206,11 @@ var DanmakuEngine = class {
   send(text) {
     this.cacheStack.push(text);
   }
+  pause() {
+    danmakuSet.forEach((danmaku) => {
+      danmaku.stopMove();
+    });
+  }
   #initTracks() {
     const trackCount = 5;
     for (let i = 0; i < trackCount; i++) {
@@ -226,6 +235,7 @@ function hello(word) {
   Danmaku,
   DanmakuEngine,
   Track,
+  danmakuSet,
   hello
 });
 //# sourceMappingURL=danmaku.cjs.js.map

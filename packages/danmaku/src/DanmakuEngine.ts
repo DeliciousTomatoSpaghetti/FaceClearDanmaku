@@ -1,14 +1,19 @@
 import { Track } from "./Track"
+import { Danmaku } from "./Danmaku"
 
 export type DanmakuEngineOptions = {
   antiOcclusion?: boolean
 }
+
+export const danmakuSet: Set<Danmaku> = new Set()
+
 export class DanmakuEngine {
   public container: HTMLElement
   public tracks: Track[] = []
   public cacheStack: string[] = []
   public isPlaying: boolean = false
   public interval: number | null = null
+
   constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions) {
     this.container = document.createElement('div')
     this.container.style.position = 'relative'
@@ -53,6 +58,12 @@ export class DanmakuEngine {
 
   send(text: string) {
     this.cacheStack.push(text)
+  }
+
+  pause() {
+    danmakuSet.forEach(danmaku => {
+      danmaku.stopMove()
+    })
   }
 
   #initTracks() {

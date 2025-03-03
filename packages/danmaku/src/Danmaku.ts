@@ -1,5 +1,6 @@
 import { Track } from "./Track"
 import { EventEmitter } from "./utils/EventEmitter"
+import { danmakuSet } from "./DanmakuEngine"
 
 type DanmakuPosition = {
   x: number
@@ -22,6 +23,7 @@ export class Danmaku {
 
   constructor(track: Track, text: string) {
     this.#initDanmaku(track, text)
+    danmakuSet.add(this)
   }
 
   #initDanmaku(track: Track, text: string) {
@@ -73,6 +75,7 @@ export class Danmaku {
   destroy() {
     this.stopMove()
     this.element?.remove()
+    danmakuSet.delete(this)
   }
 
   onCompleteShow(fn: () => any) {

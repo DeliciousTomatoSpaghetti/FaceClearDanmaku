@@ -1,7 +1,9 @@
 import { Track } from "./Track";
+import { Danmaku } from "./Danmaku";
 export type DanmakuEngineOptions = {
     antiOcclusion?: boolean;
 };
+export declare const danmakuSet: Set<Danmaku>;
 export declare class DanmakuEngine {
     #private;
     container: HTMLElement;
@@ -9,8 +11,9 @@ export declare class DanmakuEngine {
     cacheStack: string[];
     isPlaying: boolean;
     interval: number | null;
-    constructor(container: HTMLElement, options: DanmakuEngineOptions);
+    constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions);
     startPlaying(): void;
     stopPlaying(): void;
     send(text: string): void;
+    pause(): void;
 }

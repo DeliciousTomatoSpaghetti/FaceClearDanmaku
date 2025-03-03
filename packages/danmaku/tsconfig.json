@@ -20,7 +20,7 @@
 
     /* Projects */
     "composite": true, // 启用项目引用支持
-    "incremental": true // 启用增量编译
+    // "incremental": true // 启用增量编译
   },
   "include": ["src/**/*.ts"], // 包含 src 目录下的所有 .ts 文件
   "exclude": ["node_modules"] // 排除 node_modules 目录
