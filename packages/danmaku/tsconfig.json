@@ -3,7 +3,7 @@
     /* Language and Environment */
     "target": "ESNext", // 设置目标为最新的 ECMAScript 版本
     "lib": ["ESNext", "DOM"], // 包含 ESNext 和 DOM 的类型定义
-    "module": "ESNext", // 使用 ESNext 模块系统
+    "module": "NodeNext", // 使用 ESNext 模块系统
 
     /* Emit */
     "declaration": true, // 生成 .d.ts 声明文件
@@ -21,6 +21,8 @@
     /* Projects */
     "composite": true, // 启用项目引用支持
     // "incremental": true // 启用增量编译
+
+    "moduleResolution": "nodenext"
   },
   "include": ["src/**/*.ts"], // 包含 src 目录下的所有 .ts 文件
   "exclude": ["node_modules"] // 排除 node_modules 目录

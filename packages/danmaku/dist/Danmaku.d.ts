@@ -22,6 +22,7 @@ export declare class Danmaku {
     startMove(): void;
     stopMove(): void;
     destroy(): void;
+    onStartShow(fn: () => any): void;
     onCompleteShow(fn: () => any): void;
     beforeDestroy(fn: () => any): void;
 }
