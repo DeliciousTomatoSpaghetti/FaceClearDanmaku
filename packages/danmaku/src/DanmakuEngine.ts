@@ -1,6 +1,6 @@
 import { Track } from "./Track"
 import { Danmaku } from "./Danmaku"
-import { png } from "./base64"
+
 // import {maskImage} from "../public/maskimage1.jpg"
 
 export type DanmakuEngineOptions = {
@@ -11,12 +11,16 @@ export const danmakuSet: Set<Danmaku> = new Set()
 
 export class DanmakuEngine {
   public container: HTMLElement
+  public videoElement: HTMLVideoElement | null = null
   public tracks: Track[] = []
   public cacheStack: string[] = []
   public isPlaying: boolean = false
   public interval: number | null = null
 
-  constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions) {
+  constructor(parentContainer: HTMLElement, videoElement: HTMLVideoElement, options: DanmakuEngineOptions) {
+
+    this.#initVideoElement(videoElement)
+
     this.container = document.createElement('div')
     parentContainer.style.position = 'relative'
     this.container.style.position = 'absolute'
@@ -32,7 +36,7 @@ export class DanmakuEngine {
     // this.container.style.backgroundColor = 'red'
     // this.container.style.maskImage = "url('../public/maskimage2.png')"
     // this.container.style.webkitMaskBoxImage = "url('../public/maskimage2.png')"
-   
+
     this.#initTracks()
 
   }
@@ -90,6 +94,19 @@ export class DanmakuEngine {
       danmaku.stopMove()
     })
     this.isPlaying = false
+  }
+
+  #initVideoElement(videoElement: HTMLVideoElement) {
+    this.videoElement = videoElement
+    this.videoElement.addEventListener('pause', () => {
+      console.log('pause');
+      this.stopPlaying()
+    })
+
+    this.videoElement.addEventListener('play', () => {
+      console.log('play'); 
+      this.startPlaying()
+    })
   }
 
   #initTracks() {

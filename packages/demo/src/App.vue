@@ -1,7 +1,7 @@
 <template>
   <div>
     <div ref="testDivRef" style="width: 800px;height: 400px;margin: 100px;background-color: aquamarine;">
-      <video src="../public/test.mp4" autoplay loop muted controls ref="testVideoRef" style="width:100%;
+      <video ref="testVideoRef" src="../public/test.mp4" autoplay loop muted controls style="width:100%;
        height: 100%;
       ">
       </video>
@@ -21,11 +21,13 @@ import { DanmakuEngine } from 'danmaku';
 import { onMounted, ref } from 'vue';
 
 const testDivRef = ref(null)
+const testVideoRef = ref(null)
+
 let engine: DanmakuEngine | null = null
 onMounted(() => {
   console.log(testDivRef.value);
-  if (testDivRef.value) {
-    engine = new DanmakuEngine(testDivRef.value, {})
+  if (testDivRef.value && testVideoRef.value) {
+    engine = new DanmakuEngine(testDivRef.value, testVideoRef.value, {})
   }
 })
 

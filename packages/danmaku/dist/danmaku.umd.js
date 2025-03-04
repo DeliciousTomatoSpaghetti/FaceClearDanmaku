@@ -186,11 +186,13 @@ var Danmaku = (() => {
   var danmakuSet = /* @__PURE__ */ new Set();
   var DanmakuEngine = class {
     container;
+    videoElement = null;
     tracks = [];
     cacheStack = [];
     isPlaying = false;
     interval = null;
-    constructor(parentContainer, options) {
+    constructor(parentContainer, videoElement, options) {
+      this.#initVideoElement(videoElement);
       this.container = document.createElement("div");
       parentContainer.style.position = "relative";
       this.container.style.position = "absolute";
@@ -244,6 +246,17 @@ var Danmaku = (() => {
         danmaku.stopMove();
       });
       this.isPlaying = false;
+    }
+    #initVideoElement(videoElement) {
+      this.videoElement = videoElement;
+      this.videoElement.addEventListener("pause", () => {
+        console.log("pause");
+        this.stopPlaying();
+      });
+      this.videoElement.addEventListener("play", () => {
+        console.log("play");
+        this.startPlaying();
+      });
     }
     #initTracks() {
       const trackCount = 5;

@@ -11,7 +11,7 @@ export declare class DanmakuEngine {
     cacheStack: string[];
     isPlaying: boolean;
     interval: number | null;
-    constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions);
+    constructor(parentContainer: HTMLElement, videoElement: HTMLVideoElement, options: DanmakuEngineOptions);
     startPlaying(): void;
     stopPlaying(): void;
     send(text: string): void;
