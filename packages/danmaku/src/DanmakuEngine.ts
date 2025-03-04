@@ -1,5 +1,7 @@
 import { Track } from "./Track"
 import { Danmaku } from "./Danmaku"
+import { png } from "./base64"
+// import {maskImage} from "../public/maskimage1.jpg"
 
 export type DanmakuEngineOptions = {
   antiOcclusion?: boolean
@@ -16,18 +18,27 @@ export class DanmakuEngine {
 
   constructor(parentContainer: HTMLElement, options: DanmakuEngineOptions) {
     this.container = document.createElement('div')
-    this.container.style.position = 'relative'
+    parentContainer.style.position = 'relative'
+    this.container.style.position = 'absolute'
+    this.container.style.top = '0'
+    this.container.style.left = '0'
+    this.container.style.zIndex = '1000'
     this.container.style.height = '100%'
     this.container.style.width = '100%'
     this.container.style.display = 'flex'
+    this.container.style.pointerEvents = 'none'
     parentContainer.appendChild(this.container)
-    this.container.style.backgroundColor = 'transparent'
+    // this.container.style.webkitMaskBoxImage = `url(${png})`
+    // this.container.style.backgroundColor = 'red'
+    // this.container.style.maskImage = "url('../public/maskimage2.png')"
+    // this.container.style.webkitMaskBoxImage = "url('../public/maskimage2.png')"
+   
     this.#initTracks()
 
   }
 
   startPlaying() {
-    if(this.isPlaying) return
+    if (this.isPlaying) return
     this.isPlaying = true
 
     // 清除之前的轮询

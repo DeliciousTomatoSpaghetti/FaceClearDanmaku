@@ -94,6 +94,7 @@ var Danmaku = class {
     this.element.style.position = "absolute";
     this.element.style.left = `${this.position.x}px`;
     this.element.style.top = `${this.position.y}px`;
+    this.element.style.pointerEvents = "auto";
   }
   startMove() {
     this.isPaused = false;
@@ -191,12 +192,16 @@ var DanmakuEngine = class {
   interval = null;
   constructor(parentContainer, options) {
     this.container = document.createElement("div");
-    this.container.style.position = "relative";
+    parentContainer.style.position = "relative";
+    this.container.style.position = "absolute";
+    this.container.style.top = "0";
+    this.container.style.left = "0";
+    this.container.style.zIndex = "1000";
     this.container.style.height = "100%";
     this.container.style.width = "100%";
     this.container.style.display = "flex";
+    this.container.style.pointerEvents = "none";
     parentContainer.appendChild(this.container);
-    this.container.style.backgroundColor = "transparent";
     this.#initTracks();
   }
   startPlaying() {
@@ -256,7 +261,7 @@ var DanmakuEngine = class {
 
 // packages/danmaku/src/index.ts
 function hello(word) {
-  console.log("hello");
+  console.log("hello123");
   return word;
 }
 // Annotate the CommonJS export names for ESM import in node:

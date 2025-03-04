@@ -1,6 +1,10 @@
 <template>
   <div>
     <div ref="testDivRef" style="width: 800px;height: 400px;margin: 100px;background-color: aquamarine;">
+      <video src="../public/test.mp4" autoplay loop muted controls ref="testVideoRef" style="width:100%;
+       height: 100%;
+      ">
+      </video>
     </div>
     <div style="padding-left: 100px;">
       <button @click="send">send</button>

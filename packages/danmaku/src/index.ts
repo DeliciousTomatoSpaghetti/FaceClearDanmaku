@@ -1,5 +1,5 @@
 export function hello(word: string) {
-  console.log('hello')
+  console.log('hello123')
   return word
 }
 

@@ -15,11 +15,14 @@ export declare class Danmaku {
     position: DanmakuPosition | null;
     rect: DanmakuRect | null;
     speedPerFrame: number;
+    currX: number;
+    isPaused: boolean;
     private emitter;
     constructor(track: Track, text: string);
     startMove(): void;
     stopMove(): void;
     destroy(): void;
     onCompleteShow(fn: () => any): void;
+    beforeDestroy(fn: () => any): void;
 }
 export {};

@@ -44,6 +44,7 @@ export class Danmaku {
     this.element.style.position = 'absolute'
     this.element.style.left = `${this.position.x}px`
     this.element.style.top = `${this.position.y}px`
+    this.element.style.pointerEvents = 'auto'
   }
   startMove() {
     this.isPaused = false
