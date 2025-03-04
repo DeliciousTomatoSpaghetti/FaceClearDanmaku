@@ -128,6 +128,9 @@ var Danmaku = class {
     this.element?.remove();
     danmakuSet.delete(this);
   }
+  onStartShow(fn) {
+    this.emitter.once("startShow", fn);
+  }
   onCompleteShow(fn) {
     this.emitter.once("completeShow", fn);
   }
@@ -203,6 +206,7 @@ var DanmakuEngine = class {
     this.container.style.width = "100%";
     this.container.style.display = "flex";
     this.container.style.pointerEvents = "none";
+    this.container.style.overflow = "hidden";
     parentContainer.appendChild(this.container);
     this.#initTracks();
   }

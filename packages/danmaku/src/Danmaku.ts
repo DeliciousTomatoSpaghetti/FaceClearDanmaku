@@ -82,6 +82,9 @@ export class Danmaku {
     danmakuSet.delete(this)
   }
 
+  onStartShow(fn: () => any) {
+    this.emitter.once('startShow', fn)
+  }
   onCompleteShow(fn: () => any) {
     this.emitter.once('completeShow', fn)
   }

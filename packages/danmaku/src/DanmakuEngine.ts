@@ -31,6 +31,7 @@ export class DanmakuEngine {
     this.container.style.width = '100%'
     this.container.style.display = 'flex'
     this.container.style.pointerEvents = 'none'
+    this.container.style.overflow = 'hidden'
     parentContainer.appendChild(this.container)
     // this.container.style.webkitMaskBoxImage = `url(${png})`
     // this.container.style.backgroundColor = 'red'
