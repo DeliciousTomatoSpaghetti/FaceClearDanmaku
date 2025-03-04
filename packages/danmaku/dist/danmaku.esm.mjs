@@ -44378,6 +44378,7 @@ var DanmakuEngine = class {
   cacheStack = [];
   isPlaying = false;
   interval = null;
+  isProcessingVideo = false;
   constructor(parentContainer, videoElement, options) {
     this.#initVideoElement(videoElement);
     this.container = document.createElement("div");
@@ -44438,9 +44439,14 @@ var DanmakuEngine = class {
   startBodySegmentation() {
     this.videoProcess();
   }
+  stopBodySegmentation() {
+    console.log("\u505C\u6B62");
+    this.isProcessingVideo = false;
+  }
   async videoProcess() {
     if (!this.videoElement) return;
     try {
+      this.isProcessingVideo = true;
       const offscreenCanvas = document.createElement("canvas");
       const offscreenContext = offscreenCanvas.getContext("2d", { willReadFrequently: true });
       offscreenCanvas.width = this.videoElement.videoWidth;
@@ -44485,16 +44491,20 @@ var DanmakuEngine = class {
             }
           }
           offscreenContext.putImageData(frameData, 0, 0);
-          const base64 = offscreenCanvas.toDataURL();
+          const base64 = offscreenCanvas.toDataURL("image/png", 0);
           _this.container.style.maskImage = `url(${base64})`;
           _this.container.style.webkitMaskBoxImage = `url(${base64})`;
-          requestAnimationFrame(processFrame);
+          if (_this.isProcessingVideo) {
+            requestAnimationFrame(processFrame);
+          }
         } catch (frameError) {
+          _this.isProcessingVideo = false;
           console.error("Frame processing error:", frameError);
         }
       }
       processFrame();
     } catch (modelError) {
+      this.isProcessingVideo = false;
       console.error("Model initialization failed:", modelError);
     }
   }
@@ -44510,7 +44520,7 @@ var DanmakuEngine = class {
     });
   }
   #initTracks() {
-    const trackCount = 5;
+    const trackCount = 10;
     for (let i = 0; i < trackCount; i++) {
       const track = new Track({
         height: 32,

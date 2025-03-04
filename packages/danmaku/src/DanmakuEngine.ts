@@ -20,6 +20,8 @@ export class DanmakuEngine {
   public isPlaying: boolean = false
   public interval: number | null = null
 
+  private isProcessingVideo = false
+
   constructor(parentContainer: HTMLElement, videoElement: HTMLVideoElement, options: DanmakuEngineOptions) {
 
     this.#initVideoElement(videoElement)
@@ -104,10 +106,15 @@ export class DanmakuEngine {
     this.videoProcess()
   }
 
+  stopBodySegmentation() {
+    console.log("停止")
+    this.isProcessingVideo = false
+  }
+
   async videoProcess() {
     if (!this.videoElement) return
     try {
-
+      this.isProcessingVideo = true
       // 创建离屏canvas处理视频帧
       const offscreenCanvas = document.createElement('canvas');
       const offscreenContext = offscreenCanvas.getContext('2d', { willReadFrequently: true });
@@ -165,21 +172,25 @@ export class DanmakuEngine {
 
           // 绘制到主canvas
           offscreenContext.putImageData(frameData, 0, 0);
-          const base64 = offscreenCanvas.toDataURL()
+          const base64 = offscreenCanvas.toDataURL('image/png',0)
           // console.log(base64);
           // _this.container.style.backgroundImage=`url(${base64})`
           _this.container.style.maskImage = `url(${base64})`
           _this.container.style.webkitMaskBoxImage = `url(${base64})`
           // canvasContext.putImageData(frameData, 0, 0);
-          requestAnimationFrame(processFrame);
+          if (_this.isProcessingVideo) {
+            requestAnimationFrame(processFrame);
+          }
         } catch (frameError) {
+          _this.isProcessingVideo = false
           console.error('Frame processing error:', frameError);
         }
       }
 
       // 启动帧处理循环
-      processFrame();
+        processFrame();
     } catch (modelError) {
+      this.isProcessingVideo = false
       console.error('Model initialization failed:', modelError);
     }
   }
@@ -198,7 +209,7 @@ export class DanmakuEngine {
   }
 
   #initTracks() {
-    const trackCount = 5
+    const trackCount = 10
     for (let i = 0; i < trackCount; i++) {
       const track = new Track({
         height: 32,

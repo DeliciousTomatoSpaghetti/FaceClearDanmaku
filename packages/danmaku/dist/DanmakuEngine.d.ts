@@ -13,11 +13,13 @@ export declare class DanmakuEngine {
     cacheStack: string[];
     isPlaying: boolean;
     interval: number | null;
+    private isProcessingVideo;
     constructor(parentContainer: HTMLElement, videoElement: HTMLVideoElement, options: DanmakuEngineOptions);
     startPlaying(): void;
     stopPlaying(): void;
     send(text: string): void;
     pause(): void;
     startBodySegmentation(): void;
+    stopBodySegmentation(): void;
     videoProcess(): Promise<void>;
 }

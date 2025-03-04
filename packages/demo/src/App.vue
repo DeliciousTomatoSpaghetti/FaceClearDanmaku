@@ -12,6 +12,7 @@
       <button @click="stop">stop</button>
       <button @click="pause">pause</button>
       <button @click="process">图像处理</button>
+      <button @click="stopProcess">停止图像处理</button>
       <!-- <button>send</button> -->
     </div>
   </div>
@@ -59,7 +60,13 @@ function pause() {
 function process() {
   if (engine) {
     engine.startBodySegmentation()
-  } 
+  }
+}
+
+function stopProcess() {
+  if (engine) {
+    engine.stopBodySegmentation()
+  }
 }
 
 function generateRandomString(minLength: number = 5, maxLength: number = 20): string {
