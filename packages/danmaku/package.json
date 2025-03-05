@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@tensorflow-models/body-pix": "^2.2.1",
-    "@tensorflow/tfjs-backend-webgl": "^4.22.0"
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "comlink": "^4.4.2"
   }
 }

@@ -1609,8 +1609,8 @@ var require_URL = __commonJS({
     var utils = require_utils();
     var Impl = require_URL_impl();
     var impl = utils.implSymbol;
-    function URL(url) {
-      if (!this || this[impl] || !(this instanceof URL)) {
+    function URL2(url) {
+      if (!this || this[impl] || !(this instanceof URL2)) {
         throw new TypeError("Failed to construct 'URL': Please use the 'new' operator, this DOM object constructor cannot be called as a function.");
       }
       if (arguments.length < 1) {
@@ -1626,7 +1626,7 @@ var require_URL = __commonJS({
       }
       module2.exports.setup(this, args);
     }
-    URL.prototype.toJSON = function toJSON() {
+    URL2.prototype.toJSON = function toJSON() {
       if (!this || !module2.exports.is(this)) {
         throw new TypeError("Illegal invocation");
       }
@@ -1636,7 +1636,7 @@ var require_URL = __commonJS({
       }
       return this[impl].toJSON.apply(this[impl], args);
     };
-    Object.defineProperty(URL.prototype, "href", {
+    Object.defineProperty(URL2.prototype, "href", {
       get() {
         return this[impl].href;
       },
@@ -1647,20 +1647,20 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    URL.prototype.toString = function() {
+    URL2.prototype.toString = function() {
       if (!this || !module2.exports.is(this)) {
         throw new TypeError("Illegal invocation");
       }
       return this.href;
     };
-    Object.defineProperty(URL.prototype, "origin", {
+    Object.defineProperty(URL2.prototype, "origin", {
       get() {
         return this[impl].origin;
       },
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "protocol", {
+    Object.defineProperty(URL2.prototype, "protocol", {
       get() {
         return this[impl].protocol;
       },
@@ -1671,7 +1671,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "username", {
+    Object.defineProperty(URL2.prototype, "username", {
       get() {
         return this[impl].username;
       },
@@ -1682,7 +1682,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "password", {
+    Object.defineProperty(URL2.prototype, "password", {
       get() {
         return this[impl].password;
       },
@@ -1693,7 +1693,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "host", {
+    Object.defineProperty(URL2.prototype, "host", {
       get() {
         return this[impl].host;
       },
@@ -1704,7 +1704,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "hostname", {
+    Object.defineProperty(URL2.prototype, "hostname", {
       get() {
         return this[impl].hostname;
       },
@@ -1715,7 +1715,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "port", {
+    Object.defineProperty(URL2.prototype, "port", {
       get() {
         return this[impl].port;
       },
@@ -1726,7 +1726,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "pathname", {
+    Object.defineProperty(URL2.prototype, "pathname", {
       get() {
         return this[impl].pathname;
       },
@@ -1737,7 +1737,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "search", {
+    Object.defineProperty(URL2.prototype, "search", {
       get() {
         return this[impl].search;
       },
@@ -1748,7 +1748,7 @@ var require_URL = __commonJS({
       enumerable: true,
       configurable: true
     });
-    Object.defineProperty(URL.prototype, "hash", {
+    Object.defineProperty(URL2.prototype, "hash", {
       get() {
         return this[impl].hash;
       },
@@ -1764,7 +1764,7 @@ var require_URL = __commonJS({
         return !!obj && obj[impl] instanceof Impl.implementation;
       },
       create(constructorArgs, privateData) {
-        let obj = Object.create(URL.prototype);
+        let obj = Object.create(URL2.prototype);
         this.setup(obj, constructorArgs, privateData);
         return obj;
       },
@@ -1774,10 +1774,10 @@ var require_URL = __commonJS({
         obj[impl] = new Impl.implementation(constructorArgs, privateData);
         obj[impl][utils.wrapperSymbol] = obj;
       },
-      interface: URL,
+      interface: URL2,
       expose: {
-        Window: { URL },
-        Worker: { URL }
+        Window: { URL: URL2 },
+        Worker: { URL: URL2 }
       }
     };
   }
@@ -1897,9 +1897,9 @@ var require_lib2 = __commonJS({
         const span = Math.max(relativeEnd - relativeStart, 0);
         const buffer = this[BUFFER];
         const slicedBuffer = buffer.slice(relativeStart, relativeStart + span);
-        const blob = new _Blob([], { type: arguments[2] });
-        blob[BUFFER] = slicedBuffer;
-        return blob;
+        const blob2 = new _Blob([], { type: arguments[2] });
+        blob2[BUFFER] = slicedBuffer;
+        return blob2;
       }
     };
     Object.defineProperties(Blob2.prototype, {
@@ -2624,12 +2624,12 @@ var require_lib2 = __commonJS({
       configurable: true
     });
     var INTERNALS$2 = Symbol("Request internals");
-    var URL = Url.URL || whatwgUrl.URL;
+    var URL2 = Url.URL || whatwgUrl.URL;
     var parse_url = Url.parse;
     var format_url = Url.format;
     function parseURL(urlStr) {
       if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.exec(urlStr)) {
-        urlStr = new URL(urlStr).toString();
+        urlStr = new URL2(urlStr).toString();
       }
       return parse_url(urlStr);
     }
@@ -43785,6 +43785,7 @@ var Danmaku = class {
     };
     this.element = document.createElement("div");
     this.element.innerText = text;
+    this.element.style.color = "#fff";
     this.parentTrack.container.appendChild(this.element);
     this.rect = {
       width: this.element.clientWidth,
@@ -43884,7 +43885,59 @@ var Track = class {
   }
 };
 
+// packages/danmaku/src/worker/inlineWorker.ts
+var workerCode = `
+self.onmessage = function (e) {
+  const { frameData, segmentationResult } = e.data;
+
+  let ifHasBody = false;
+  // \u5E94\u7528\u5206\u5272\u8499\u7248
+  for (let i = 0; i < segmentationResult.length; i++) {
+    if (segmentationResult[i] === 0) { // \u80CC\u666F\u50CF\u7D20
+      frameData.data[i * 4 + 3] = 255; // \u8BBE\u7F6E\u5B8C\u5168\u900F\u660E
+    } else { // \u4EBA\u7269\u50CF\u7D20
+      ifHasBody = true;
+      frameData.data[i * 4] = 0;     // R \u8BBE\u7F6E\u4E3A 0
+      frameData.data[i * 4 + 1] = 0; // G \u8BBE\u7F6E\u4E3A 0
+      frameData.data[i * 4 + 2] = 0; // B \u8BBE\u7F6E\u4E3A 0
+      frameData.data[i * 4 + 3] = 0; // \u4FDD\u6301\u4E0D\u900F\u660E
+    }
+  }
+
+  if (!ifHasBody) {
+    self.postMessage(null);
+    return;
+  }
+  // \u5C06 ImageData \u8F6C\u6362\u4E3A Base64
+  imageDataToBase64(frameData).then((base64) => {
+    // \u5C06 Base64 \u8FD4\u56DE\u7ED9\u4E3B\u7EBF\u7A0B
+    self.postMessage(base64);
+  });
+}
+
+function imageDataToBase64(imageData) {
+  // \u521B\u5EFA\u4E00\u4E2A\u4E34\u65F6 canvas
+  const canvas = new OffscreenCanvas(imageData.width, imageData.height);
+  const ctx = canvas.getContext("2d");
+
+  // \u5C06 ImageData \u7ED8\u5236\u5230 canvas
+  ctx.putImageData(imageData, 0, 0);
+
+  // \u5C06 canvas \u8F6C\u6362\u4E3A Base64
+  return canvas.convertToBlob().then((blob) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  });
+}
+`;
+var blob = new Blob([workerCode], { type: "application/javascript" });
+var toDataURLWorker = new Worker(URL.createObjectURL(blob));
+
 // packages/danmaku/src/DanmakuEngine.ts
+console.log(toDataURLWorker);
 var danmakuSet = /* @__PURE__ */ new Set();
 var DanmakuEngine = class {
   container;
@@ -43959,69 +44012,71 @@ var DanmakuEngine = class {
     this.isProcessingVideo = false;
   }
   async videoProcess() {
-    if (!this.videoElement) return;
-    try {
-      this.isProcessingVideo = true;
-      const offscreenCanvas = document.createElement("canvas");
-      const offscreenContext = offscreenCanvas.getContext("2d", { willReadFrequently: true });
-      offscreenCanvas.width = this.videoElement.videoWidth;
-      offscreenCanvas.height = this.videoElement.videoHeight;
-      const segmentationModel = await bodyPix.load();
-      const _this = this;
-      async function processFrame() {
-        try {
-          if (!offscreenContext) {
-            throw new Error("Offscreen canvas context unavailable");
-            return;
-          }
-          if (!_this.videoElement) {
-            throw new Error("videoElement is null");
-          }
-          offscreenContext.drawImage(
-            _this.videoElement,
-            0,
-            0,
-            _this.videoElement.videoWidth,
-            _this.videoElement.videoHeight
-          );
-          const segmentationResult = await segmentationModel.segmentPerson(offscreenCanvas, {
-            segmentationThreshold: 0.7,
-            internalResolution: "medium",
-            maxDetections: 1
-          });
-          const frameData = offscreenContext.getImageData(
-            0,
-            0,
-            _this.videoElement.videoWidth,
-            _this.videoElement.videoHeight
-          );
-          for (let i = 0; i < segmentationResult.data.length; i++) {
-            if (segmentationResult.data[i] === 0) {
-              frameData.data[i * 4 + 3] = 255;
-            } else {
-              frameData.data[i * 4] = 0;
-              frameData.data[i * 4 + 1] = 0;
-              frameData.data[i * 4 + 2] = 0;
-              frameData.data[i * 4 + 3] = 0;
-            }
-          }
-          offscreenContext.putImageData(frameData, 0, 0);
-          const base64 = offscreenCanvas.toDataURL("image/png", 0);
-          _this.container.style.maskImage = `url(${base64})`;
-          _this.container.style.webkitMaskBoxImage = `url(${base64})`;
-          if (_this.isProcessingVideo) {
-            requestAnimationFrame(processFrame);
-          }
-        } catch (frameError) {
-          _this.isProcessingVideo = false;
-          console.error("Frame processing error:", frameError);
-        }
-      }
-      processFrame();
-    } catch (modelError) {
-      this.isProcessingVideo = false;
-      console.error("Model initialization failed:", modelError);
+    if (!this.videoElement) {
+      throw new Error("videoElement is null");
+      return;
     }
+    const WIDTH = this.videoElement.offsetWidth;
+    const HEIGHT = this.videoElement.offsetHeight;
+    const offscreenCanvas = new OffscreenCanvas(WIDTH, HEIGHT);
+    const offscreenContext = offscreenCanvas.getContext("2d");
+    let lastTime = 0;
+    const targetFPS = 15;
+    let intervalTime = 1e3 / targetFPS;
+    const segmentationModel = await bodyPix.load();
+    const _this = this;
+    async function processFrame() {
+      if (!offscreenContext) {
+        throw new Error("offscreenContext is null");
+        return;
+      }
+      if (!_this.videoElement) {
+        throw new Error("videoElement is null");
+        return;
+      }
+      const currentTime = performance.now();
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime < intervalTime) {
+        requestAnimationFrame(processFrame);
+        return;
+      }
+      lastTime = currentTime;
+      offscreenContext.drawImage(
+        _this.videoElement,
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+      );
+      const segmentationResult = await segmentationModel.segmentPerson(offscreenCanvas, {
+        segmentationThreshold: 0.7,
+        internalResolution: "high",
+        maxDetections: 1
+      });
+      const frameData = offscreenContext.getImageData(
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+      );
+      toDataURLWorker.postMessage({
+        frameData,
+        segmentationResult: segmentationResult.data
+      }, [frameData.data.buffer, segmentationResult.data.buffer]);
+      toDataURLWorker.onmessage = function(e) {
+        const base64 = e.data;
+        if (!base64) {
+          intervalTime = 2e3;
+          _this.container.style.webkitMaskBoxImage = "none";
+          return;
+        } else {
+          intervalTime = 1e3 / targetFPS;
+          _this.container.style.webkitMaskBoxImage = `url(${base64})`;
+        }
+      };
+      requestAnimationFrame(processFrame);
+    }
+    processFrame();
   }
   #initVideoElement(videoElement) {
     this.videoElement = videoElement;

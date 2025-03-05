@@ -4,7 +4,11 @@ import '@tensorflow/tfjs-backend-webgl';
 import { Track } from "./Track"
 import { Danmaku } from "./Danmaku"
 
-// import {maskImage} from "../public/maskimage1.jpg"
+import { toDataURLWorker } from './worker/inlineWorker';
+
+import { url } from './base64test';
+
+console.log(toDataURLWorker);
 
 export type DanmakuEngineOptions = {
   antiOcclusion?: boolean
@@ -25,7 +29,7 @@ export class DanmakuEngine {
   constructor(parentContainer: HTMLElement, videoElement: HTMLVideoElement, options: DanmakuEngineOptions) {
 
     this.#initVideoElement(videoElement)
-
+    // console.log(toDataURLWorker);
     this.container = document.createElement('div')
     parentContainer.style.position = 'relative'
     this.container.style.position = 'absolute'
@@ -37,6 +41,9 @@ export class DanmakuEngine {
     this.container.style.display = 'flex'
     this.container.style.pointerEvents = 'none'
     this.container.style.overflow = 'hidden'
+
+    // this.container.style.backgroundImage = `url(${url})`
+
     parentContainer.appendChild(this.container)
     // this.container.style.webkitMaskBoxImage = `url(${png})`
     // this.container.style.backgroundColor = 'red'
@@ -112,87 +119,88 @@ export class DanmakuEngine {
   }
 
   async videoProcess() {
-    if (!this.videoElement) return
-    try {
-      this.isProcessingVideo = true
-      // 创建离屏canvas处理视频帧
-      const offscreenCanvas = document.createElement('canvas');
-      const offscreenContext = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+    if (!this.videoElement) {
+      throw new Error("videoElement is null");
+      return;
+    }
+    const WIDTH = this.videoElement.offsetWidth
+    const HEIGHT = this.videoElement.offsetHeight
+    // console.log(WIDTH,HEIGHT,this.container.offsetWidth,this.container.offsetHeight);
 
-      offscreenCanvas.width = this.videoElement.videoWidth;
-      offscreenCanvas.height = this.videoElement.videoHeight;
+    // 创建离屏canvas处理视频帧
+    const offscreenCanvas = new OffscreenCanvas(WIDTH, HEIGHT);
 
-      // 加载BodyPix模型
-      const segmentationModel = await bodyPix.load();
+    const offscreenContext = offscreenCanvas.getContext('2d');
 
-      const _this = this
-      // 帧处理函数
-      async function processFrame() {
-        try {
-          if (!offscreenContext) {
-            throw new Error('Offscreen canvas context unavailable');
-            return
-          }
-          if (!_this.videoElement) {
-            throw new Error("videoElement is null");
+    let lastTime = 0;
+    const targetFPS = 15;
+    let intervalTime = 1000 / targetFPS; // 每帧的时间间隔（毫秒）
 
-          }
-          // 绘制当前视频帧到离屏canvas
-          offscreenContext.drawImage(
-            _this.videoElement,
-            0, 0,
-            _this.videoElement.videoWidth,
-            _this.videoElement.videoHeight
-          );
+    // 加载BodyPix模型
+    const segmentationModel = await bodyPix.load();
 
-          // 执行人物分割
-          const segmentationResult = await segmentationModel.segmentPerson(offscreenCanvas, {
-            segmentationThreshold: 0.7,
-            internalResolution: 'medium',
-            maxDetections: 1
-          });
-          // 获取像素数据
-          const frameData = offscreenContext.getImageData(
-            0, 0,
-            _this.videoElement.videoWidth,
-            _this.videoElement.videoHeight
-          );
+    const _this = this
+    async function processFrame() {
+      if (!offscreenContext) {
+        throw new Error("offscreenContext is null");
+        return;
+      }
+      if (!_this.videoElement) {
+        throw new Error("videoElement is null");
+        return;
+      }
 
-          // 应用分割蒙版
-          for (let i = 0; i < segmentationResult.data.length; i++) {
-            if (segmentationResult.data[i] === 0) { // 背景像素
-              frameData.data[i * 4 + 3] = 255; // 设置完全透明
-            } else { // 人物像素
-              frameData.data[i * 4] = 0;     // R 设置为 0
-              frameData.data[i * 4 + 1] = 0; // G 设置为 0
-              frameData.data[i * 4 + 2] = 0; // B 设置为 0
-              frameData.data[i * 4 + 3] = 0; // 保持不透明
-            }
-          }
+      const currentTime = performance.now();
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime < intervalTime) {
+        requestAnimationFrame(processFrame);
+        return
+      }
+      lastTime = currentTime
 
-          // 绘制到主canvas
-          offscreenContext.putImageData(frameData, 0, 0);
-          const base64 = offscreenCanvas.toDataURL('image/png',0)
-          // console.log(base64);
-          // _this.container.style.backgroundImage=`url(${base64})`
-          _this.container.style.maskImage = `url(${base64})`
-          _this.container.style.webkitMaskBoxImage = `url(${base64})`
-          // canvasContext.putImageData(frameData, 0, 0);
-          if (_this.isProcessingVideo) {
-            requestAnimationFrame(processFrame);
-          }
-        } catch (frameError) {
-          _this.isProcessingVideo = false
-          console.error('Frame processing error:', frameError);
+      // 绘制当前视频帧到离屏canvas
+      offscreenContext.drawImage(
+        _this.videoElement,
+        0, 0,
+        WIDTH,
+        HEIGHT
+      );
+
+      // 执行人物分割
+      const segmentationResult = await segmentationModel.segmentPerson(offscreenCanvas, {
+        segmentationThreshold: 0.7,
+        internalResolution: 'high',
+        maxDetections: 1
+      });
+      // 获取像素数据
+      const frameData = offscreenContext.getImageData(
+        0, 0,
+        WIDTH,
+        HEIGHT
+      );
+
+      toDataURLWorker.postMessage({
+        frameData: frameData,
+        segmentationResult: segmentationResult.data,
+      }, [frameData.data.buffer, segmentationResult.data.buffer])
+      toDataURLWorker.onmessage = function (e) {
+        const base64 = e.data
+        if (!base64) {
+          // debugger
+          intervalTime = 2000
+          _this.container.style.webkitMaskBoxImage = 'none';
+          return
+        } else {
+          intervalTime = 1000 / targetFPS; // 每帧的时间间隔（毫秒）
+          _this.container.style.webkitMaskBoxImage = `url(${base64})`;
         }
       }
 
-      // 启动帧处理循环
-        processFrame();
-    } catch (modelError) {
-      this.isProcessingVideo = false
-      console.error('Model initialization failed:', modelError);
+      requestAnimationFrame(processFrame);
+
     }
+    // 启动帧处理循环
+    processFrame();
   }
 
   #initVideoElement(videoElement: HTMLVideoElement) {

@@ -35,6 +35,7 @@ export class Danmaku {
     }
     this.element = document.createElement('div')
     this.element.innerText = text
+    this.element.style.color = '#fff'
     this.parentTrack.container.appendChild(this.element)
 
     this.rect = {

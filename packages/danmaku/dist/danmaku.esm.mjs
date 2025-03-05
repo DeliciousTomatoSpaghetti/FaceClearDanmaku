@@ -44270,6 +44270,7 @@ var Danmaku = class {
     };
     this.element = document.createElement("div");
     this.element.innerText = text;
+    this.element.style.color = "#fff";
     this.parentTrack.container.appendChild(this.element);
     this.rect = {
       width: this.element.clientWidth,
@@ -44369,7 +44370,59 @@ var Track = class {
   }
 };
 
+// packages/danmaku/src/worker/inlineWorker.ts
+var workerCode = `
+self.onmessage = function (e) {
+  const { frameData, segmentationResult } = e.data;
+
+  let ifHasBody = false;
+  // \u5E94\u7528\u5206\u5272\u8499\u7248
+  for (let i = 0; i < segmentationResult.length; i++) {
+    if (segmentationResult[i] === 0) { // \u80CC\u666F\u50CF\u7D20
+      frameData.data[i * 4 + 3] = 255; // \u8BBE\u7F6E\u5B8C\u5168\u900F\u660E
+    } else { // \u4EBA\u7269\u50CF\u7D20
+      ifHasBody = true;
+      frameData.data[i * 4] = 0;     // R \u8BBE\u7F6E\u4E3A 0
+      frameData.data[i * 4 + 1] = 0; // G \u8BBE\u7F6E\u4E3A 0
+      frameData.data[i * 4 + 2] = 0; // B \u8BBE\u7F6E\u4E3A 0
+      frameData.data[i * 4 + 3] = 0; // \u4FDD\u6301\u4E0D\u900F\u660E
+    }
+  }
+
+  if (!ifHasBody) {
+    self.postMessage(null);
+    return;
+  }
+  // \u5C06 ImageData \u8F6C\u6362\u4E3A Base64
+  imageDataToBase64(frameData).then((base64) => {
+    // \u5C06 Base64 \u8FD4\u56DE\u7ED9\u4E3B\u7EBF\u7A0B
+    self.postMessage(base64);
+  });
+}
+
+function imageDataToBase64(imageData) {
+  // \u521B\u5EFA\u4E00\u4E2A\u4E34\u65F6 canvas
+  const canvas = new OffscreenCanvas(imageData.width, imageData.height);
+  const ctx = canvas.getContext("2d");
+
+  // \u5C06 ImageData \u7ED8\u5236\u5230 canvas
+  ctx.putImageData(imageData, 0, 0);
+
+  // \u5C06 canvas \u8F6C\u6362\u4E3A Base64
+  return canvas.convertToBlob().then((blob) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  });
+}
+`;
+var blob = new Blob([workerCode], { type: "application/javascript" });
+var toDataURLWorker = new Worker(URL.createObjectURL(blob));
+
 // packages/danmaku/src/DanmakuEngine.ts
+console.log(toDataURLWorker);
 var danmakuSet = /* @__PURE__ */ new Set();
 var DanmakuEngine = class {
   container;
@@ -44444,69 +44497,71 @@ var DanmakuEngine = class {
     this.isProcessingVideo = false;
   }
   async videoProcess() {
-    if (!this.videoElement) return;
-    try {
-      this.isProcessingVideo = true;
-      const offscreenCanvas = document.createElement("canvas");
-      const offscreenContext = offscreenCanvas.getContext("2d", { willReadFrequently: true });
-      offscreenCanvas.width = this.videoElement.videoWidth;
-      offscreenCanvas.height = this.videoElement.videoHeight;
-      const segmentationModel = await load();
-      const _this = this;
-      async function processFrame() {
-        try {
-          if (!offscreenContext) {
-            throw new Error("Offscreen canvas context unavailable");
-            return;
-          }
-          if (!_this.videoElement) {
-            throw new Error("videoElement is null");
-          }
-          offscreenContext.drawImage(
-            _this.videoElement,
-            0,
-            0,
-            _this.videoElement.videoWidth,
-            _this.videoElement.videoHeight
-          );
-          const segmentationResult = await segmentationModel.segmentPerson(offscreenCanvas, {
-            segmentationThreshold: 0.7,
-            internalResolution: "medium",
-            maxDetections: 1
-          });
-          const frameData = offscreenContext.getImageData(
-            0,
-            0,
-            _this.videoElement.videoWidth,
-            _this.videoElement.videoHeight
-          );
-          for (let i = 0; i < segmentationResult.data.length; i++) {
-            if (segmentationResult.data[i] === 0) {
-              frameData.data[i * 4 + 3] = 255;
-            } else {
-              frameData.data[i * 4] = 0;
-              frameData.data[i * 4 + 1] = 0;
-              frameData.data[i * 4 + 2] = 0;
-              frameData.data[i * 4 + 3] = 0;
-            }
-          }
-          offscreenContext.putImageData(frameData, 0, 0);
-          const base64 = offscreenCanvas.toDataURL("image/png", 0);
-          _this.container.style.maskImage = `url(${base64})`;
-          _this.container.style.webkitMaskBoxImage = `url(${base64})`;
-          if (_this.isProcessingVideo) {
-            requestAnimationFrame(processFrame);
-          }
-        } catch (frameError) {
-          _this.isProcessingVideo = false;
-          console.error("Frame processing error:", frameError);
-        }
-      }
-      processFrame();
-    } catch (modelError) {
-      this.isProcessingVideo = false;
-      console.error("Model initialization failed:", modelError);
+    if (!this.videoElement) {
+      throw new Error("videoElement is null");
+      return;
     }
+    const WIDTH = this.videoElement.offsetWidth;
+    const HEIGHT = this.videoElement.offsetHeight;
+    const offscreenCanvas = new OffscreenCanvas(WIDTH, HEIGHT);
+    const offscreenContext = offscreenCanvas.getContext("2d");
+    let lastTime = 0;
+    const targetFPS = 15;
+    let intervalTime = 1e3 / targetFPS;
+    const segmentationModel = await load();
+    const _this = this;
+    async function processFrame() {
+      if (!offscreenContext) {
+        throw new Error("offscreenContext is null");
+        return;
+      }
+      if (!_this.videoElement) {
+        throw new Error("videoElement is null");
+        return;
+      }
+      const currentTime = performance.now();
+      const deltaTime = currentTime - lastTime;
+      if (deltaTime < intervalTime) {
+        requestAnimationFrame(processFrame);
+        return;
+      }
+      lastTime = currentTime;
+      offscreenContext.drawImage(
+        _this.videoElement,
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+      );
+      const segmentationResult = await segmentationModel.segmentPerson(offscreenCanvas, {
+        segmentationThreshold: 0.7,
+        internalResolution: "high",
+        maxDetections: 1
+      });
+      const frameData = offscreenContext.getImageData(
+        0,
+        0,
+        WIDTH,
+        HEIGHT
+      );
+      toDataURLWorker.postMessage({
+        frameData,
+        segmentationResult: segmentationResult.data
+      }, [frameData.data.buffer, segmentationResult.data.buffer]);
+      toDataURLWorker.onmessage = function(e) {
+        const base64 = e.data;
+        if (!base64) {
+          intervalTime = 2e3;
+          _this.container.style.webkitMaskBoxImage = "none";
+          return;
+        } else {
+          intervalTime = 1e3 / targetFPS;
+          _this.container.style.webkitMaskBoxImage = `url(${base64})`;
+        }
+      };
+      requestAnimationFrame(processFrame);
+    }
+    processFrame();
   }
   #initVideoElement(videoElement) {
     this.videoElement = videoElement;
