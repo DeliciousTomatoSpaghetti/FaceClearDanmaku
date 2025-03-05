@@ -42,7 +42,7 @@ export class DanmakuEngine {
     this.container.style.pointerEvents = 'none'
     this.container.style.overflow = 'hidden'
 
-    // this.container.style.backgroundImage = `url(${url})`
+    this.container.style.backgroundImage = `url(${url})`
 
     parentContainer.appendChild(this.container)
     // this.container.style.webkitMaskBoxImage = `url(${png})`
@@ -152,7 +152,7 @@ export class DanmakuEngine {
 
       const currentTime = performance.now();
       const deltaTime = currentTime - lastTime;
-      if (deltaTime < intervalTime) {
+      if (deltaTime < intervalTime || !_this.isPlaying) {
         requestAnimationFrame(processFrame);
         return
       }
@@ -217,7 +217,7 @@ export class DanmakuEngine {
   }
 
   #initTracks() {
-    const trackCount = 10
+    const trackCount = 15
     for (let i = 0; i < trackCount; i++) {
       const track = new Track({
         height: 32,

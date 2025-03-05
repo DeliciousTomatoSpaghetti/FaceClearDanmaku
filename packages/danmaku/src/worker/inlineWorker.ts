@@ -1,4 +1,3 @@
-// 主线程代码
 const workerCode = `
 self.onmessage = function (e) {
   const { frameData, segmentationResult } = e.data;
@@ -47,16 +46,6 @@ function imageDataToBase64(imageData) {
 }
 `;
 
-// 将 Worker 代码转换为 Blob
 const blob = new Blob([workerCode], { type: 'application/javascript' });
 
-// 创建 Worker
 export const toDataURLWorker = new Worker(URL.createObjectURL(blob));
-
-// 监听 Worker 的消息
-// toDataURLWorker.onmessage = (event) => {
-//   console.log('Received message from worker:', event.data);
-// };
-
-// 向 Worker 发送消息
-// worker.postMessage('hello');
