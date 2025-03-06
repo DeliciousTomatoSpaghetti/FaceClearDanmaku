@@ -8,8 +8,6 @@ import { toDataURLWorker } from './worker/inlineWorker';
 
 import { url } from './base64test';
 
-console.log(toDataURLWorker);
-
 export type DanmakuEngineOptions = {
   antiOcclusion?: boolean
 }
@@ -42,7 +40,7 @@ export class DanmakuEngine {
     this.container.style.pointerEvents = 'none'
     this.container.style.overflow = 'hidden'
 
-    this.container.style.backgroundImage = `url(${url})`
+    // this.container.style.backgroundImage = `url(${url})`
 
     parentContainer.appendChild(this.container)
     // this.container.style.webkitMaskBoxImage = `url(${png})`
@@ -123,6 +121,13 @@ export class DanmakuEngine {
       throw new Error("videoElement is null");
       return;
     }
+
+    const videoWidth = this.videoElement.videoWidth;
+    const videoHeight = this.videoElement.videoHeight;
+    const videoAspectRatio = videoWidth / videoHeight;
+
+    const { renderedWidth, renderedHeight } = this.#getVideoRenderedSize();
+
     const WIDTH = this.videoElement.offsetWidth
     const HEIGHT = this.videoElement.offsetHeight
     // console.log(WIDTH,HEIGHT,this.container.offsetWidth,this.container.offsetHeight);
@@ -161,9 +166,9 @@ export class DanmakuEngine {
       // 绘制当前视频帧到离屏canvas
       offscreenContext.drawImage(
         _this.videoElement,
-        0, 0,
-        WIDTH,
-        HEIGHT
+        (WIDTH - renderedWidth) / 2, (HEIGHT - renderedHeight) / 2,
+        renderedWidth,
+        renderedHeight,
       );
 
       // 执行人物分割
@@ -201,6 +206,35 @@ export class DanmakuEngine {
     }
     // 启动帧处理循环
     processFrame();
+  }
+
+  #getVideoRenderedSize() {
+    if (!this.videoElement) {
+      throw new Error("videoElement is null");
+    }
+
+    const containerWidth = this.container.clientWidth;
+    const containerHeight = this.container.clientHeight;
+
+    const videoRatio = this.videoElement.videoWidth / this.videoElement.videoHeight; // 视频原始宽高比
+    const containerRatio = containerWidth / containerHeight; // 容器宽高比
+
+    let renderedWidth, renderedHeight;
+
+    if (containerRatio > videoRatio) {
+      // 容器比视频宽，视频高度填满容器，宽度按比例缩放
+      renderedHeight = containerHeight;
+      renderedWidth = containerHeight * videoRatio;
+    } else {
+      // 容器比视频高，视频宽度填满容器，高度按比例缩放
+      renderedWidth = containerWidth;
+      renderedHeight = containerWidth / videoRatio;
+    }
+
+    return {
+      renderedWidth,
+      renderedHeight
+    };
   }
 
   #initVideoElement(videoElement: HTMLVideoElement) {

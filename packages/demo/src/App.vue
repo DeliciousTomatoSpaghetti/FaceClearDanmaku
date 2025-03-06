@@ -3,6 +3,8 @@
     <div ref="testDivRef" style="width: 800px;height: 400px;margin: 30px;background-color: aquamarine;">
       <video ref="testVideoRef" src="../public/dance.mp4" autoplay loop muted controls style="width:100%;
        height: 100%;
+       object-fit: contain;
+       background: black;
       ">
       </video>
     </div>
