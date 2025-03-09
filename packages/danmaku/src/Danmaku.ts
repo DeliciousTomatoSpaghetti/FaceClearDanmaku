@@ -34,8 +34,11 @@ export class Danmaku {
       y: this.parentTrack.index * this.parentTrack.height
     }
     this.element = document.createElement('div')
-    this.element.innerText = text
-    this.element.style.color = '#fff'
+    const textElement = document.createElement('span')
+    textElement.innerText = text
+    textElement.style.whiteSpace = 'nowrap'
+    textElement.style.color = '#fff'
+    this.element.appendChild(textElement)
     this.parentTrack.container.appendChild(this.element)
 
     this.rect = {

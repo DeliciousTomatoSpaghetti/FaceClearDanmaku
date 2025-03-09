@@ -32,6 +32,9 @@ onMounted(() => {
   console.log(testDivRef.value);
   if (testDivRef.value && testVideoRef.value) {
     engine = new DanmakuEngine(testDivRef.value, testVideoRef.value, {})
+    setInterval(() => {
+      engine?.send("测试123")
+    }, 100)
   }
 })
 
