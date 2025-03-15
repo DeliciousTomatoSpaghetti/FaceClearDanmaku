@@ -24,8 +24,8 @@
 import { DanmakuEngine } from 'danmaku';
 import { onMounted, ref } from 'vue';
 
-const testDivRef = ref(null)
-const testVideoRef = ref(null)
+const testDivRef = ref<HTMLDivElement | null>(null)
+const testVideoRef = ref<HTMLVideoElement | null>(null)
 
 let engine: DanmakuEngine | null = null
 onMounted(() => {
@@ -47,6 +47,7 @@ function send() {
 function start() {
   if (engine) {
     engine.startPlaying()
+    testVideoRef.value?.play()
   }
 }
 
@@ -59,6 +60,7 @@ function stop() {
 function pause() {
   if (engine) {
     engine.pause()
+    testVideoRef.value?.pause()
   }
 }
 
