@@ -44474,6 +44474,7 @@ function imageDataToBase64(imageData) {
         danmaku.startMove();
       });
       this.interval = setInterval(() => {
+        if (!this.isPlaying) return;
         if (this.cacheStack.length) {
           const text = this.cacheStack.shift();
           if (text) {

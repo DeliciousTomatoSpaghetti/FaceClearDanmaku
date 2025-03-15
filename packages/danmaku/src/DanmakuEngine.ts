@@ -70,7 +70,7 @@ export class DanmakuEngine {
     // 轮询每个未锁定的轨道，如果有弹幕则发送
     this.interval = setInterval(() => {
       // console.log("interval", this.cacheStack, Math.random());
-
+      if(!this.isPlaying) return
       if (this.cacheStack.length) {
         const text = this.cacheStack.shift()
         if (text) {
